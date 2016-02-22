@@ -1,0 +1,103 @@
+# STAT 425 HW#1 Ruizhe Chen; rchen18
+## 3. 
+```{r include=FALSE}
+library(car)
+library(effects)
+library(alr4)
+```
+
+```{r}
+fit_Wt<-lm(Wt~Sex+Ht+SSF+Bfat,data=ais)
+```
+* **(a) [2 pts] Present a summary of your fitted model.**
+```{r}
+summary(fit_Wt)
+```
+* **(b) [2 pts] Give the least squares estimates of all coefficients.**
+```{r}
+fit_Wt$coefficients
+```
+* **(c) [2 pts] What is the name for the proportion of variation in the response explained by the predictors? What is its value, for the model you fit?**
+
+<span style="color:red">the proportion of variation in the response explained by the predictors is called: coefficient of determination/Multiple R Squared. Its value is 0.7623.</span>
+
+* **(d) Which observation (case number) has the largest (positive) residual? Also, what is its fitted value?**
+```{r, echo=FALSE}
+plot(resid(fit_Wt))
+points(163,max(resid(fit_Wt)),col="blue",pch=19)
+abline(h=max(resid(fit_Wt)),v=163,lty=2)
+```
+
+```{r}
+which.max(resid(fit_Wt))
+matrix(fitted.values(fit_Wt))[163,1]
+```
+
+* **(e) Supposing all other predictors are held constant, what would be the difference in weight (kg) for a male compared to a female, according to this model?**
+```{r}
+fit_Wt$coefficients["Sex"]
+```
+
+* **(f) Which independent variables are statistically significant at the 5% (0.05) level?**
+:
+```{r}
+summary(fit_Wt)$coefficients[,4]
+```
+
+<span style="color:red">According to the p-values of the variables, We should reject SSF and Bfat.</span>
+
+* **(g) Compute individual 95% confidence intervals for all of the regression coefficients.**
+```{r}
+confint(fit_Wt, level = 0.95)
+```
+
+* **(h)Predict the weight (kg) of a 170 cm tall female with sum of skin folds equal to 60 and 12% body fat. Also, give a 95% prediction interval.**
+```{r}
+New_Data<-data.frame(Sex=1,Ht=170,SSF=60,Bfat=0.12)
+predict(fit_Wt,New_Data)
+predict(fit_Wt,New_Data,interval = "prediction", level = 0.95)
+```
+
+* **(i) Fit a model with only sex and height as the predictors, and use an F-test to compare it with the full model.**
+```{r}
+fit_Wt_Reduced<-lm(Wt~Sex+Ht,data=ais)
+anova(fit_Wt,fit_Wt_Reduced)
+```
+
+## 4.
+```{r}
+fit_FuelC<-lm(FuelC~Income+Pop+Tax,data=fuel2001)
+```
+
+* **(a)Present a summary of your fitted model.**
+```{r}
+summary(fit_FuelC)
+```
+
+* **(b)Using the summary, test the (null) hypothesis that Beta_Income=0.**
+```{r}
+summary(fit_FuelC)$coefficient[,4]
+```
+
+<span style="color:red">Since the p-value of Beta_Income(7.997948e-02 )is bigger than 0.05, we can't reject the null hypothesis at 5% significance value.</span>
+
+* **(c)Using the summary, test the (null) hypothesis that Beta_Income = Beta_Pop = Beta_Tax = 0.**
+
+<span style="color:red">The p-value: < 2.2e-16, so we can reject the null hypothesis at %5.</span>
+
+* **(d)Add Drivers as another predictor, and present a summary of your fitted model.**
+```{r}
+fit_FuelC_Add_Drivers<-lm(FuelC~Income+Pop+Tax+Drivers,data=fuel2001)
+summary(fit_FuelC_Add_Drivers)
+```
+
+* **(e)Use an F-test to test whether Beta_Drivers = 0.**
+```{r}
+anova(fit_FuelC_Add_Drivers,fit_FuelC)
+```
+
+<span style="color:red">Since the p-value:0.0002923 is less than 0.05, we can reject the null hypothesis that Beta_Drivers=0<span>
+
+* **(f)Compare your results in the previous part with the results of a t-test for Drivers = 0. Are they the same?**
+
+<span style="color:red">Yes, they are the same.<span>
